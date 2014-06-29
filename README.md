@@ -20,3 +20,6 @@ Usage
 ### Running the program
 
 Execute `python -m hue_log` to start the program.
+
+The log will be written to standard out, so feel free to redirect the
+output to the log file that should be used.

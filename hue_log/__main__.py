@@ -15,7 +15,11 @@ Usage
 ### Running the program
 
 Execute `python -m hue_log` to start the program.
+
+The log will be written to standard out, so feel free to redirect the
+output to the log file that should be used.
 """
+import json
 import os
 import sys
 
@@ -45,4 +49,29 @@ def get_bridge():
         sys.exit(1)
 
 
+def extract_relevant_data(api):
+    """Extract relevant information from the api that should be logged.
+
+    Args:
+        api: Dictionary of the full api dictionary from the Bridge.
+
+    Returns:
+        Dictionary of the relevant information that should be logged.
+        Includes the imestamp from the `api` dict in the "config".
+    """
+    relevant_data = {
+        'config': {
+            'UTC': api['config']['UTC'],
+            'localtime': api['config']['localtime'],
+            'timezone': api['config']['timezone'],
+        },
+        'lights': api['lights'],
+    }
+    return relevant_data
+
+
 bridge = get_bridge()
+# TODO(bwbaugh|2014-06-28): Periodically back up the entire `api`.
+api = bridge.get_api()
+relevant_data = extract_relevant_data(api)
+sys.stdout.write(json.dumps(relevant_data) + '\n')
