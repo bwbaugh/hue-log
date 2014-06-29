@@ -22,6 +22,7 @@ output to the log file that should be used.
 import json
 import os
 import sys
+import time
 
 from phue import Bridge
 from phue import PhueRegistrationException
@@ -71,7 +72,13 @@ def extract_relevant_data(api):
 
 
 bridge = get_bridge()
-# TODO(bwbaugh|2014-06-28): Periodically back up the entire `api`.
-api = bridge.get_api()
-relevant_data = extract_relevant_data(api)
-sys.stdout.write(json.dumps(relevant_data) + '\n')
+while 1:
+    try:
+        # TODO(bwbaugh|2014-06-28): Periodically back up the entire `api`.
+        api = bridge.get_api()
+        relevant_data = extract_relevant_data(api)
+        sys.stdout.write(json.dumps(relevant_data) + '\n')
+        # Sleep before next read for rate limiting.
+        time.sleep(5)
+    except KeyboardInterrupt:
+        break
