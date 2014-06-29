@@ -25,11 +25,13 @@ output to the log file that should be used.
 """
 import json
 import os
+import socket
 import sys
 import time
 
 from phue import Bridge
 from phue import PhueRegistrationException
+from retrying import retry
 
 
 # If enabled, emit the full api dict, otherwise only the relevant data.
@@ -79,11 +81,28 @@ def extract_relevant_data(api):
     return relevant_data
 
 
+def _is_network_exception(exception):
+    return isinstance(exception, socket.error)
+
+
+@retry(
+    retry_on_exception=_is_network_exception,
+    # Balance being robust against extended outages and crashing to
+    # indicate that the program cannot function due to an extended issue.
+    stop_max_delay=1000 * 60 * 60 * 12,
+    wait_exponential_multiplier=1000 * 1,
+    wait_exponential_max=1000 * 5,
+)
+def _get_api(bridge):
+    """Helper to retry if there is a temporary network problem."""
+    return bridge.get_api()
+
+
 bridge = get_bridge()
 last_light_data = None
 while 1:
     try:
-        api = bridge.get_api()
+        api = _get_api(bridge)
         if IS_VERBOSE:
             relevant_data = api
         else:
