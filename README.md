@@ -7,7 +7,11 @@ throughout the day.
 Usage
 -----
 
-### First time setup
+### Configuration
+
+Before running, the program must first be configured.
+
+#### First time setup
 
 1.  Execute `make` in order to set up the virtual environment.
 2.  Activate the virtual environment e.g., `source venv/bin/activate`.
@@ -16,6 +20,12 @@ Usage
 4.  Press the home button on the bridge before starting the program,
     which is needed so that the program can register with the bridge
     for authentication purposes.
+
+#### Verbose output
+
+Optionally, set the `VERBOSE` environment variable to `1` in order to
+log the full api dictionary whenever a log is emitted, otherwise only
+relevant data will be outputted i.e., light state and timestamps.
 
 ### Running the program
 

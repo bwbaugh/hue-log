@@ -12,6 +12,10 @@ Usage
     before starting the program, which is needed so that the program
     can register with the bridge for authentication purposes.
 
+Optionally, set the `VERBOSE` environment variable to `1` in order to
+log the full api dictionary whenever a log is emitted, otherwise only
+relevant data will be outputted i.e., light state and timestamps.
+
 ### Running the program
 
 Execute `python -m hue_log` to start the program.
@@ -26,6 +30,10 @@ import time
 
 from phue import Bridge
 from phue import PhueRegistrationException
+
+
+# If enabled, emit the full api dict, otherwise only the relevant data.
+IS_VERBOSE = bool(int(os.environ.get('VERBOSE', 0)))
 
 
 def get_bridge():
@@ -75,9 +83,12 @@ bridge = get_bridge()
 last_light_data = None
 while 1:
     try:
-        # TODO(bwbaugh|2014-06-28): Periodically back up the entire `api`.
         api = bridge.get_api()
-        relevant_data = extract_relevant_data(api)
+        if IS_VERBOSE:
+            relevant_data = api
+        else:
+            # TODO(bwbaugh|2014-06-28): Periodically back up the entire `api`.
+            relevant_data = extract_relevant_data(api)
         current_light_data = relevant_data['lights']
         if current_light_data != last_light_data:
             # Only emit a log line if a light's state has changed.
