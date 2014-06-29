@@ -72,12 +72,23 @@ def extract_relevant_data(api):
 
 
 bridge = get_bridge()
+last_light_data = None
 while 1:
     try:
         # TODO(bwbaugh|2014-06-28): Periodically back up the entire `api`.
         api = bridge.get_api()
         relevant_data = extract_relevant_data(api)
-        sys.stdout.write(json.dumps(relevant_data) + '\n')
+        current_light_data = relevant_data['lights']
+        if current_light_data != last_light_data:
+            # Only emit a log line if a light's state has changed.
+            # NOTE: The first iteration will always emit a log line
+            # since we don't have access to the state prior to when the
+            # program started.
+            sys.stdout.write(json.dumps(relevant_data) + '\n')
+            # Make sure the line is immediately visible since it may be
+            # a while before the next log line.
+            sys.stdout.flush()
+            last_light_data = current_light_data
         # Sleep before next read for rate limiting.
         time.sleep(5)
     except KeyboardInterrupt:
