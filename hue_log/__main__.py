@@ -84,7 +84,7 @@ while 1:
             # NOTE: The first iteration will always emit a log line
             # since we don't have access to the state prior to when the
             # program started.
-            sys.stdout.write(json.dumps(relevant_data) + '\n')
+            sys.stdout.write(json.dumps(relevant_data, sort_keys=True) + '\n')
             # Make sure the line is immediately visible since it may be
             # a while before the next log line.
             sys.stdout.flush()
