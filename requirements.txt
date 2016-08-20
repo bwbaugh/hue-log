@@ -1,2 +1,2 @@
-phue==0.7
+phue==0.8
 retrying==1.2.2
